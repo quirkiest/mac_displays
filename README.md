@@ -5,7 +5,7 @@ Displayplacer:  https://github.com/jakehilborn/displayplacer
 
 Wallpaper:      https://github.com/sindresorhus/macos-wallpaper
 
-This is a Pythin script to automate "normalisation" of my Mac monitors.  I have 2 external monitors attached to an M1 Macbook via a StarTech dock. 
+mac_displays.py is a Python script to automate "normalisation" of my Mac monitors.  I have 2 external monitors attached to an M1 Macbook via a StarTech dock. 
 My Mac are constantly getting confused about position and wallpaper settings, whenever I restart, disconnect or even sleep the Mac.
 
 Displayplacer(DP) is an excellent CLI that resolves this.  Wallpaper does the same thing for desktop wallpapers, although it uses contextual IDs (that is, ID like 0,1,2 which are assigned in the ortdee that the Maxc detects the displays).
