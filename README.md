@@ -23,20 +23,20 @@ Script will default to looking for a file called "mac_displays_params.json" if n
         "id":0,
         "Description" : "MacBook built in screen",
         "Serial screen id" : "xxx123",
-        "Wallpaper" : "/Users/wazza/Pictures/Dynamic Wallpapers/earth.heic",
+        "Wallpaper" : "/Users/username/Pictures/Dynamic Wallpapers/earth.heic",
         "Width": "1728"
     },
     "lg":{
         "id":1,
         "Description" : "LG UltraFine",
         "Serial screen id" : "xxx321",
-        "Wallpaper" : "/Users/wazza/Pictures/Dynamic Wallpapers/Fuji.heic"
+        "Wallpaper" : "/Users/username/Pictures/Dynamic Wallpapers/Fuji.heic"
     },
     "philips":{
         "id":2,
         "Description" : "Philips 328B",
         "Serial screen id" : "xxx456",
-        "Wallpaper" : "/Users/wazza/Pictures/Dynamic Wallpapers/Star Trek Strange New Worlds V4.heic"
+        "Wallpaper" : "/Users/username/Pictures/Dynamic Wallpapers/Star Trek Strange New Worlds V4.heic"
     }
     }
 ```
@@ -44,7 +44,7 @@ Script will default to looking for a file called "mac_displays_params.json" if n
 | parameter  | meaning |
 | ------------- | ------------- |
 | id  | this is default contextual id, replaced by fhe script.  |
-| Description | Descriptionn of the monitor.  Not mandatory.
+| Description | Description of the monitor.  Not mandatory.
 | Serial screen id  | Serial number of the display (from Displayplacer output)  |
 | Wallpaper | Path to wallpaper file |
 | Width | Only for default display, replaced by the script |
