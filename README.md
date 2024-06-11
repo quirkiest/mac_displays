@@ -2,6 +2,7 @@
 Python script to use Displayplacer &amp; Wallpaper apps to organise Mac monitors 
 
 Displayplacer:  https://github.com/jakehilborn/displayplacer
+
 Wallpaper:      https://github.com/sindresorhus/macos-wallpaper
 
 This is a Pythin script to automate "normalisation" of my Mac monitors.  I have 2 external monitors attached to an M1 Macbook via a StarTech dock. 
