@@ -36,7 +36,7 @@ Script will default to looking for a file called "mac_displays_params.json" if n
         "id":2,
         "Description" : "Philips 328B",
         "Serial screen id" : "xxx456",
-        "Wallpaper" : "/Users/username/Pictures/Dynamic Wallpapers/Star Trek Strange New Worlds V4.heic"
+        "Wallpaper" : "/Users/username/Pictures/Dynamic Wallpapers/Trek.heic"
     }
     }
 ```
