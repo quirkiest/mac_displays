@@ -40,7 +40,8 @@ Script will default to looking for a file called "mac_displays_params.json" if n
     }
     }
 ```
-    | parameter  | meaning |
+
+| parameter  | meaning |
 | ------------- | ------------- |
 | id  | this is default contextual id, replaced by fhe script.  |
 | Description | Descriptionn of the monitor.  Not mandatory.
