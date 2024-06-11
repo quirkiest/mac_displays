@@ -1,0 +1,21 @@
+{
+    "apple":{
+        "id":0,
+        "Description" : "MacBook built in screen",
+        "Serial screen id" : "s4251086178",
+        "Wallpaper" : "/Users/wazza/Pictures/Dynamic Wallpapers/earth.heic",
+        "Width": "1728"
+    },
+    "lg":{
+        "id":1,
+        "Description" : "LG UltraFine",
+        "Serial screen id" : "s16843009",
+        "Wallpaper" : "/Users/wazza/Pictures/Dynamic Wallpapers/Fuji.heic"
+    },
+    "philips":{
+        "id":2,
+        "Description" : "Philips 328B",
+        "Serial screen id" : "s5929",
+        "Wallpaper" : "/Users/wazza/Pictures/Dynamic Wallpapers/Star Trek Strange New Worlds V4.heic"
+    }
+    }
