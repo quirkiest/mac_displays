@@ -16,8 +16,8 @@ So the script checks the "displayplacer list" output and loads the results into 
 
 Script will default to looking for a file called "mac_displays_params.json" if no filepath is provided as an argument.
 
-mac_displays_params.json:
-
+## mac_displays_params.json: ##
+```
 {
     "apple":{
         "id":0,
@@ -39,7 +39,7 @@ mac_displays_params.json:
         "Wallpaper" : "/Users/wazza/Pictures/Dynamic Wallpapers/Star Trek Strange New Worlds V4.heic"
     }
     }
-
+```
     | parameter  | meaning |
 | ------------- | ------------- |
 | id  | this is default contextual id, replaced by fhe script.  |
