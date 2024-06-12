@@ -84,6 +84,18 @@ def load_screen_info(stream):
          (line.split(": ", 1) for line in section.split("Resolutions for rotation 0:")[0].strip().split("\n") if ": " in line)}
         for section in sections
     ]
+
+def do_origin(param, width, height):
+    pos = param.get("position","home").lower()
+    if pos == "home":
+        return "origin:(0,0)"
+    elif pos == "topright":
+        return f"origin:({int(params['apple']['Width']/2)},-{height})"
+    elif pos == "topleft":
+        return f"origin:(-{int(width-int(params['apple']['Width'])/2)},-{height})"
+    else:
+        return "origin:(0,0)"
+    
 output = os.popen('displayplacer list').read()
 screen_info = load_screen_info(output)
 #pprint.pprint(screen_info)
@@ -98,17 +110,7 @@ for screen in screen_info:
 
 
 displayplacer_command = "displayplacer "
-def do_origin(param, width, height):
-    pos = param.get("position","home").lower()
-    if pos == "home":
-        return "origin:(0,0)"
-    elif pos == "topright":
-        return f"origin:({int(params['apple']['Width']/2)},-{height})"
-    elif pos == "topleft":
-        return f"origin:(-{int(width-int(params['apple']['Width'])/2)},-{height})"
-    else:
-        return "origin:(0,0)"
-    
+
 for i,val in enumerate(screen_info):
     screen_serial_id = val["Serial screen id"]
     params_dict = {screen["Serial screen id"]: screen for screen in params.values()}
