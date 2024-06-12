@@ -11,6 +11,7 @@
 import json
 import sys
 import os
+#import pprint # only used for debugging
 
 # Determine the path to the script to construct the default params file path
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -22,8 +23,31 @@ params_file_path = sys.argv[1] if len(sys.argv) > 1 else default_params_path
 # Load params from the specified JSON file
 with open(params_file_path, 'r') as file:
     params = json.load(file)
-    
 
+# ================== mac_displays_params.json ==================
+""" 
+{
+    "apple":{
+        "id":0,
+        "Description" : "MacBook built in screen",
+        "Serial screen id" : "xxx123",
+        "Wallpaper" : "/Users/username/Pictures/Dynamic Wallpapers/earth.heic",
+        "Width": 1728
+    },
+    "lg":{
+        "id":1,
+        "Description" : "LG UltraWide",
+        "Serial screen id" : "xxx321",
+        "Wallpaper" : "/Users/username/Pictures/Dynamic Wallpapers/Fuji.heic"
+    },
+    "philips":{
+        "id":2,
+        "Description" : "Philips 123",
+        "Serial screen id" : "xxx456",
+        "Wallpaper" : "/Users/username/Pictures/Dynamic Wallpapers/Trek.heic"
+    }
+    }
+"""
 def getres(res):
     """
     Converts a resolution string in the format 'widthxheight' into a tuple of integers (width, height).
@@ -64,50 +88,43 @@ output = os.popen('displayplacer list').read()
 screen_info = load_screen_info(output)
 #pprint.pprint(screen_info)
 
+# this gets the width of the Macbook built-in screen
+# which is needed for relative positioning of the other screens
+
 for screen in screen_info:
     screen["Width"], screen["Height"] = getres(screen["Resolution"])
-    if screen["Serial screen id"] == params["apple"]["Serial screen id"]:
-        params['apple']['Width'] = screen["Width"]
+    if screen["Serial screen id"] == params.get("apple",{}).get("Serial screen id"):
+        params['apple']['Width'] = int(screen.get("Width",1728))
 
-apple_wallpaper_id = 0
-LG_monitor_id = 1
-philips_monitor_id = 2
 
 displayplacer_command = "displayplacer "
-
+def do_origin(param, width, height):
+    pos = param.get("position","home").lower()
+    if pos == "home":
+        return "origin:(0,0)"
+    elif pos == "topright":
+        return f"origin:({int(params['apple']['Width']/2)},-{height})"
+    elif pos == "topleft":
+        return f"origin:(-{int(width-int(params['apple']['Width'])/2)},-{height})"
+    else:
+        return "origin:(0,0)"
+    
 for i,val in enumerate(screen_info):
-    id = val["Serial screen id"]
-    if id == params['apple']['Serial screen id']: 
-        params['apple']['id'] = i
-        origin = f"origin:(0,0)"
-    elif id == params["lg"]["Serial screen id"]:
-        params['lg']['id'] = i
-        origin = f"origin:({int(params['apple']['Width']/2)},-{val['Height']})"
-    elif id == params['philips']['Serial screen id']:
-        params['philips']['id'] = i
-        origin = f"origin:(-{int(val['Width']-int(params['apple']['Width'])/2)},-{val['Height']})"
-    displayplacer_command += f' \"id:{val.get("Persistent screen id")} res:{val.get("Resolution")} hz:{val.get("Hertz","8")} color_depth:{val.get("Color Depth")} enabled:true scaling:{val.get("Scaling","off")} {origin} degree:0\"'
+    screen_serial_id = val["Serial screen id"]
+    params_dict = {screen["Serial screen id"]: screen for screen in params.values()}
+    params_serial_id = params_dict.get(screen_serial_id)
+    if params_serial_id:
+        params_serial_id["id"] = i
+        params_serial_id["origin"] = do_origin(params_serial_id, val["Width"], val["Height"])
+        displayplacer_command += f' \"id:{val.get("Persistent screen id")} res:{val.get("Resolution")} hz:{val.get("Hertz","8")} color_depth:{val.get("Color Depth")} enabled:true scaling:{val.get("Scaling","off")} {params_serial_id["origin"]} degree:0\"'
 
 """
 displayplacer 
 "id:37D8832A-2D66-02CA-B9F7-8F30A301B230 res:1728x1117 hz:120 color_depth:8 enabled:true scaling:on origin:(0,0) degree:0" "id:768F61BA-BCF8-41EC-B2BC-3F20ED8D936E res:3440x1440 hz:60 color_depth:8 enabled:true scaling:off origin:(864,-1440) degree:0" "id:ACCC194E-6907-46F1-B364-B27BF313D122 res:3008x1692 hz:60 color_depth:8 enabled:true scaling:off origin:(-2144,-1692) degree:0"
 """
 
-# print(displayplacer_command)
-
 stream = os.popen(displayplacer_command)
 
-# Store wallpaper commands in a list
-wallpaper_commands = [
-    f'wallpaper set "{params["apple"]["Wallpaper"]}" --screen {params["apple"]["id"]}',
-    f'wallpaper set "{params["philips"]["Wallpaper"]}" --screen {params["philips"]["id"]}',
-    f'wallpaper set "{params["lg"]["Wallpaper"]}" --screen {params["lg"]["id"]}'
-]
-# Execute each wallpaper command
-for cmd in wallpaper_commands:
-    os.system(cmd)
-# Apple_wallpaper = os.popen(f'wallpaper set "/Users/wazza/Pictures/Dynamic Wallpapers/earth.heic" --screen {apple_wallpaper_id}')
-# Philips_wallpaper = os.popen(f'wallpaper set "/Users/wazza/Pictures/Dynamic Wallpapers/Star Trek Strange New Worlds V4.heic" --screen {philips_monitor_id}')
-# LG_wallpaper = os.popen(f'wallpaper set "/Users/wazza/Pictures/Dynamic Wallpapers/Fuji.heic" --screen {LG_monitor_id}')
-
+for screen in params.values():
+    os.popen(f'wallpaper set "{screen["Wallpaper"]}" --screen {screen["id"]}')
 

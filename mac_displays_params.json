@@ -4,7 +4,7 @@
         "Description" : "MacBook built in screen",
         "Serial screen id" : "xxx123",
         "Wallpaper" : "/Users/username/Pictures/Dynamic Wallpapers/earth.heic",
-        "Width": "1728"
+        "Width": 1728
     },
     "lg":{
         "id":1,
