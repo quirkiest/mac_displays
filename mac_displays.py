@@ -93,18 +93,23 @@ def load_screen_info(stream):
         for section in sections
     ]
 
-def do_origin(param, width, height):
-    pos = param.get("position","home").lower()
-    if pos == "home":
-        return "(0,0)"
-    elif pos == "topright":
-        return f"({int(params['apple']['Width']/2)},-{height})"
-    elif pos == "topleft":
-        return f"(-{int(width-int(params['apple']['Width'])/2)},-{height})"
-    elif pos == "midleft":
-        return f"(-{int(width)},-{int(height/2)})"
-    else:
-        return "(0,0)"
+def do_origin(screen_param, width, height):
+    width = int(width)
+    height = int(height)
+    applewidth = int(params['apple']['Width']) # note this is from global params
+    pos = screen_param.get("position", "home").lower()
+    positions = {
+        "home": "(0,0)",
+        "topright": f"({int(applewidth/2)},-{height})",
+        "topleft": f"(-{int(width-applewidth/2)},-{height})",
+        "midleft": f"(-{width},-{int(height/2)})",
+        "midright": f"({applewidth},-{int(height/2)})",
+        "left": f"(-{width},0)",
+        "right": f"({applewidth},0)",
+        "above": f"(0,-{height})",
+        "below": f"(0,{height})",
+    }
+    return positions.get(pos, "(0,0)")
 
 # Determine the path to the script to construct the default params file path
 script_dir = os.path.dirname(os.path.abspath(__file__))
