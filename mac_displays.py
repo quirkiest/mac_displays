@@ -126,9 +126,9 @@ for screen in screen_info:
     # if screen["Serial screen id"] == params.get("apple",{}).get("Serial screen id"):
     #     params['apple']['Width'] = int(screen.get("Width",1728))
 
-# this gets the width of the first screen in the list (apple mactop built-in monitor)
-# which is needed for relative positioning of the other screens.
-# We set it as "apple" screen, which will usually exist in params, or get created if not.
+# this gets the width of the first screen in the list (which is always apple mactop built-in monitor).
+# This is needed for relative positioning of the other screens.
+# We set it as "apple" width, which will usually exist in params, or get created if not.
 params['apple']['Width'] = screen_info[0].get("Width",1728)
 
 displayplacer_command = "displayplacer "
@@ -140,11 +140,12 @@ for i,val in enumerate(screen_info):
     
     params_serial_id["Width"], params_serial_id["Height"] = getres(params_serial_id["Resolution"]) if params_serial_id.get("Resolution") else (val["Width"], val["Height"])
     if params_serial_id:
-        params_serial_id["id"] = i
+        #params_serial_id["id"] = i
         params_serial_id["origin"] = do_origin(params_serial_id, params_serial_id["Width"], params_serial_id["Height"])
         displayplacer_command += f' \"id:{params_serial_id["Serial screen id"]} res:{params_serial_id.get("Resolution") or val.get("Resolution") or ""} enabled:true scaling:{params_serial_id.get("Scaling") or val.get("Scaling","off") or ""} origin:{params_serial_id["origin"]} degree:0\"'
-        wallpaper_path = params_serial_id.get("Wallpaper")
-        if wallpaper_path: wallpapers.append(f'wallpaper set "{params_serial_id["Wallpaper"]}" --screen {i}')
+        wallpaper_path = params_serial_id.get("Wallpaper", {})
+        if wallpaper_path:
+            wallpapers.append(f'wallpaper set "{wallpaper_path}" --screen {i}')
 
 # print (displayplacer_command)
 #displayplacer_command = 'displayplacer "id:s4251086178 res:1728x1117 enabled:true scaling:on origin:(0,0) degree:0" "id:s5929 res:3008x1692 enabled:true scaling:on origin:(-2144,-1692) degree:0" "id:s16843009 res:3440x1440 enabled:true scaling:off origin:(864,-1440) degree:0"'
