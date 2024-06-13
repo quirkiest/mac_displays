@@ -1,21 +1,34 @@
 {
-    "apple":{
-        "id":0,
-        "Description" : "MacBook built in screen",
-        "Serial screen id" : "xxx123",
-        "Wallpaper" : "/Users/username/Pictures/Dynamic Wallpapers/earth.heic",
+    "apple": {
+        "id": 0,
+        "Description": "MacBook built in screen",
+        "position": "home",
+        "Serial screen id": "s4251086178",
+        "Wallpaper": "/Users/wazza/Pictures/Dynamic Wallpapers/earth.heic",
         "Width": 1728
     },
-    "lg":{
-        "id":1,
-        "Description" : "LG UltraWide",
-        "Serial screen id" : "xxx321",
-        "Wallpaper" : "/Users/username/Pictures/Dynamic Wallpapers/Fuji.heic"
+    "lg": {
+        "id": 1,
+        "Description": "LG UltraFine",
+        "position": "topright",
+        "Resolution": "3440x1440",
+        "Serial screen id": "s16843009",
+        "Wallpaper": "/Users/wazza/Pictures/Dynamic Wallpapers/Fuji.heic"
     },
-    "philips":{
-        "id":2,
-        "Description" : "Philips 123",
-        "Serial screen id" : "xxx456",
-        "Wallpaper" : "/Users/username/Pictures/Dynamic Wallpapers/Trek.heic"
+    "philips": {
+        "id": 2,
+        "Description": "Philips 328B",
+        "position": "topleft",
+        "Resolution": "3008x1692",
+        "Serial screen id": "s5929",
+        "Wallpaper": "/Users/wazza/Pictures/Dynamic Wallpapers/Star Trek Strange New Worlds V4.heic"
+    },
+    "dell": {
+        "id": 1,
+        "Description": "Dell 22 inch",
+        "position": "midleft",
+        "Resolution": "1920x1080",
+        "Serial screen id": "s827208514",
+        "Wallpaper": "/Users/wazza/Pictures/Dynamic Wallpapers/Star Trek Strange New Worlds V4.heic"
     }
-    }
+}
