@@ -1,43 +1,5 @@
 #!/usr/bin/env python
-###########################
-#        CREDITS          #
-###########################
 
-__author__      = "Warwick Matthews"
-__copyright__   = "Copyright 2024, Warwick Matthews"
-__credits__     = ["Warwick Matthews"]
-__license__     = "MIT"
-__version__     = "0.9"
-__updatedate__  = "2024-06-13"
-__maintainer__  = "Warwick Matthews"
-__email__       = "python@quirkiest.com"
-__status__      = "active development"
-
-# MIT License
-
-# Copyright (c) 2024 Warwick Matthews
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-
-###########################
-#       REFERENCES        #
-###########################
 # Displayplacer
 # https://github.com/jakehilborn/displayplacer
 
@@ -46,17 +8,22 @@ __status__      = "active development"
 
 # Note: both installed via HomeBbrew
 
-###########################
-#         IMPORTS         #
-###########################
 import json
 import sys
 import os
 import pprint # only used for debugging
 
-###########################
-#        FUNCTIONS        #
-###########################
+# Determine the path to the script to construct the default params file path
+script_dir = os.path.dirname(os.path.abspath(__file__))
+default_params_path = os.path.join(script_dir, "mac_displays_params.json")
+
+# Use the first command line argument as the params file path if provided, else use the default
+params_file_path = sys.argv[1] if len(sys.argv) > 1 else default_params_path
+
+# Load params from the specified JSON file
+with open(params_file_path, 'r') as file:
+    json_params = json.load(file)
+
 def getres(res):
     """
     Converts a resolution string in the format 'widthxheight' into a tuple of integers (width, height).
@@ -69,6 +36,7 @@ def getres(res):
     """
     return tuple(map(int, res.split('x')))
     
+# return screen_info_list
 def load_screen_info(stream):
 
     """
@@ -93,70 +61,85 @@ def load_screen_info(stream):
         for section in sections
     ]
 
-def do_origin(screen_param, width, height):
-    width = int(width)
-    height = int(height)
-    applewidth = int(params['apple']['Width']) # note this is from global params
-    pos = screen_param.get("position", "home").lower()
-    positions = {
-        "home": "(0,0)",
-        "topright": f"({int(applewidth/2)},-{height})",
-        "topleft": f"(-{int(width-applewidth/2)},-{height})",
-        "midleft": f"(-{width},-{int(height/2)})",
-        "midright": f"({applewidth},-{int(height/2)})",
-        "left": f"(-{width},0)",
-        "right": f"({applewidth},0)",
-        "above": f"(0,-{height})",
-        "below": f"(0,{height})",
-    }
-    return positions.get(pos, "(0,0)")
 
-# Determine the path to the script to construct the default params file path
-script_dir = os.path.dirname(os.path.abspath(__file__))
-default_params_path = os.path.join(script_dir, "mac_displays_params.json")
-
-# Use the first command line argument as the params file path if provided, else use the default
-params_file_path = sys.argv[1] if len(sys.argv) > 1 else default_params_path
-
-# Load params from the specified JSON file
-with open(params_file_path, 'r') as file:
-    params = json.load(file)
-
+def do_origin(param, width, height):
+    pos = param.get("position","home").lower()
+    if pos == "home":
+        return "(0,0)"
+    elif pos == "topright":
+        return f"({int(json_params['apple']['Width']/2)},-{height})"
+    elif pos == "topleft":
+        return f"(-{int(width-int(json_params['apple']['Width'])/2)},-{height})"
+    elif pos == "midleft":
+        return f"(-{int(width)},-{int(height/2)})"
+    elif pos == "topmid":
+        print(f"{int((width-json_params['apple']['Width'])/2)*-1},-{height}")
+        return f"({int((width-json_params['apple']['Width'])/2)*-1},-{height})"
+    else:
+        return "(0,0)"
+    
+# Open the displayplacer list command and read the output
 output = os.popen('displayplacer list').read()
-screen_info = load_screen_info(output)
-#pprint.pprint(screen_info)
+displayplacer_screen_info = load_screen_info(output)
+# pprint.pprint(screen_info)
 
-for screen in screen_info:
-    screen["Width"], screen["Height"] = getres(screen["Resolution"])
-    # if screen["Serial screen id"] == params.get("apple",{}).get("Serial screen id"):
-    #     params['apple']['Width'] = int(screen.get("Width",1728))
+# def get_unique_id(screen):
+#     serial_id = screen.get("Serial screen id", "")
+#     persistent_id = screen.get("Persistent screen id", "")
+#     return f"{serial_id}_{persistent_id}"
 
-# this gets the width of the first screen in the list (which is always apple mactop built-in monitor).
-# This is needed for relative positioning of the other screens.
-# We set it as "apple" width, which will usually exist in params, or get created if not.
-params['apple']['Width'] = screen_info[0].get("Width",1728)
+# Get Width & Height from displayplacer_screen_info string
+# for screen in displayplacer_screen_info:
+#     screen["Width"], screen["Height"] = getres(screen["Resolution"])
+    # special case for the apple screen (because we know what its resolution is)
+    # inserts detected width into the apple screen params
+    # if screen.get("Type") == "MacBook built in screen":
+    #     pprint.pprint(screen)
+    #     json_params['apple']['Width'] = int(screen.get("Width", 1728))
 
 displayplacer_command = "displayplacer "
 wallpapers = []
-for i,val in enumerate(screen_info):
-    screen_serial_id = val.get("Serial screen id")
-    params_dict = {screen["Serial screen id"]: screen for screen in params.values()}
-    params_serial_id = params_dict.get(screen_serial_id)
-    
-    params_serial_id["Width"], params_serial_id["Height"] = getres(params_serial_id["Resolution"]) if params_serial_id.get("Resolution") else (val["Width"], val["Height"])
-    if params_serial_id:
-        #params_serial_id["id"] = i
-        params_serial_id["origin"] = do_origin(params_serial_id, params_serial_id["Width"], params_serial_id["Height"])
-        displayplacer_command += f' \"id:{params_serial_id["Serial screen id"]} res:{params_serial_id.get("Resolution") or val.get("Resolution") or ""} enabled:true scaling:{params_serial_id.get("Scaling") or val.get("Scaling","off") or ""} origin:{params_serial_id["origin"]} degree:0\"'
-        wallpaper_path = params_serial_id.get("Wallpaper", {})
-        if wallpaper_path:
-            wallpapers.append(f'wallpaper set "{wallpaper_path}" --screen {i}')
 
+def count_matching_values(dict1, dict2):
+    """Count the number of matching values between two dictionaries and return the count and matching keys."""
+    matched_keys = [key for key in dict1 if key in dict2 and dict1[key] == dict2[key]]
+    return len(matched_keys), matched_keys
+
+for i, dp_val in enumerate(displayplacer_screen_info):
+    # screen_unique_id = get_unique_id(val)
+    params_dict = {key: value for key, value in json_params.items()}
+    
+    # Find the best match
+    best_match = None
+    matchlist = None
+    max_matches = -1
+    for screen_id, screen_params in params_dict.items():
+        matches, matched_keys = count_matching_values(dp_val, screen_params)
+        if matches > max_matches:
+            max_matches = matches
+            best_match = screen_params
+            matchlist = matched_keys
+    
+    if best_match:
+        # print(f"{val['Type']} => {best_match['Description']} : {matchlist}")
+        dp_val["Width"], dp_val["Height"] = getres(dp_val["Resolution"])
+        if best_match.get("Resolution"):
+            best_match["Width"], best_match["Height"] = getres(best_match["Resolution"])
+        else:
+            best_match["Width"] = dp_val["Width"]
+            best_match["Height"] = dp_val["Height"]
+        best_match["id"] = i
+        best_match["origin"] = do_origin(best_match, best_match["Width"], best_match["Height"])
+        displayplacer_command += f' \"id:{best_match["Serial screen id"]} res:{best_match.get("Resolution") or dp_val.get("Resolution") or ""} enabled:true scaling:{best_match.get("Scaling") or dp_val.get("Scaling", "off") or ""} origin:{best_match["origin"]} degree:0\"'
+        wallpapers.append(f'wallpaper set "{best_match["Wallpaper"]}" --screen {i}')
 # print (displayplacer_command)
 #displayplacer_command = 'displayplacer "id:s4251086178 res:1728x1117 enabled:true scaling:on origin:(0,0) degree:0" "id:s5929 res:3008x1692 enabled:true scaling:on origin:(-2144,-1692) degree:0" "id:s16843009 res:3440x1440 enabled:true scaling:off origin:(864,-1440) degree:0"'
+
+#displayplacer "id:37D8832A-2D66-02CA-B9F7-8F30A301B230 res:1728x1117 hz:120 color_depth:8 enabled:true scaling:on origin:(0,0) degree:0" "id:E075EA1B-045E-4B2E-94A5-53E3EEF9B75D res:1920x1080 hz:60 color_depth:8 enabled:true scaling:off origin:(-1920,-540) degree:0"
 
 stream = os.popen(displayplacer_command)
 
 for wallpaper in wallpapers:
+    #print(wallpaper)
     os.popen(wallpaper)
 

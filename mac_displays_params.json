@@ -4,16 +4,20 @@
         "Description": "MacBook built in screen",
         "position": "home",
         "Serial screen id": "s4251086178",
+        "Persistent screen id": "37D8832A-2D66-02CA-B9F7-8F30A301B230",
+        "Type": "MacBook built in screen",
         "Wallpaper": "/Users/wazza/Pictures/Dynamic Wallpapers/earth.heic",
         "Width": 1728
     },
     "lg": {
         "id": 1,
-        "Description": "LG UltraFine",
+        "Description": "LG UltraWide",
         "position": "topright",
         "Resolution": "3440x1440",
         "Serial screen id": "s16843009",
-        "Wallpaper": "/Users/wazza/Pictures/Dynamic Wallpapers/Fuji.heic"
+        "Type:": "34 inch external screen",
+       "Persistent screen id": "763976BC-94A5-4133-8AC0-EE5F37AF1D31",
+        "Wallpaper": "/Users/wazza/Pictures/Dynamic Wallpapers/Star Trek Strange New Worlds V4.heic"
     },
     "philips": {
         "id": 2,
@@ -21,7 +25,9 @@
         "position": "topleft",
         "Resolution": "3008x1692",
         "Serial screen id": "s5929",
-        "Wallpaper": "/Users/wazza/Pictures/Dynamic Wallpapers/Star Trek Strange New Worlds V4.heic"
+        "Persistent screen id": "DBC76B2B-CDFE-4AE7-A1C0-C18DE79E59DD",
+        "Type": "32 inch external screen",
+        "Wallpaper": "/Users/wazza/Pictures/Dynamic Wallpapers/Fuji.heic"
     },
     "dell": {
         "id": 1,
@@ -29,6 +35,16 @@
         "position": "midleft",
         "Resolution": "1920x1080",
         "Serial screen id": "s827208514",
+        "Persistent screen id": "837E33F0-CDBA-49A5-86AF-1F128D4AC938",
         "Wallpaper": "/Users/wazza/Pictures/Dynamic Wallpapers/Star Trek Strange New Worlds V4.heic"
+    },
+    "nec": {
+        "id": 1,
+        "Description": "NEC 58 inch external screen",
+        "position": "topmid",
+        "Resolution": "1920x1080",
+        "Serial screen id": "s16843009",
+        "Persistent screen id": "E075EA1B-045E-4B2E-94A5-53E3EEF9B75D",
+        "Wallpaper": "/Users/wazza/Pictures/Wallpapers/ASAC_CDL_bg.png"
     }
 }
