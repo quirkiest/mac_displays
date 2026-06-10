@@ -1,0 +1,42 @@
+{
+  "config_version": "2.0.0",
+  "saved_at": "2026-06-10T17:16:51",
+  "slots": [
+    {
+      "slot": "external_1",
+      "type": "22 inch external screen",
+      "serial_id": "s627053632",
+      "resolution": "2560x1440",
+      "hertz": "60",
+      "color_depth": "8",
+      "scaling": "off",
+      "origin": "(-2560,-194)",
+      "degree": "0",
+      "wallpaper": "/Users/wazza/Pictures/Dynamic Wallpapers/Star Trek Strange New Worlds V4.heic"
+    },
+    {
+      "slot": "builtin",
+      "type": "MacBook built in screen",
+      "serial_id": "s4251086178",
+      "resolution": "1728x1117",
+      "hertz": "120",
+      "color_depth": "8",
+      "scaling": "on",
+      "origin": "(0,0)",
+      "degree": "0 - rotate internal screen example (may crash computer, but will be rotated after rebooting): `displayplacer \"id:37D8832A-2D66-02CA-B9F7-8F30A301B230 degree:90\"`",
+      "wallpaper": "/System/Library/CoreServices/DefaultDesktop.heic"
+    },
+    {
+      "slot": "external_2",
+      "type": "22 inch external screen",
+      "serial_id": "s627053632",
+      "resolution": "2560x1440",
+      "hertz": "60",
+      "color_depth": "8",
+      "scaling": "off",
+      "origin": "(1728,0)",
+      "degree": "0",
+      "wallpaper": "/Users/wazza/Pictures/Dynamic Wallpapers/Fuji.heic"
+    }
+  ]
+}
