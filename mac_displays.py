@@ -28,7 +28,7 @@ Usage:
   mac_displays.py version          Print version
 """
 
-VERSION = "2.0.0"
+VERSION = "2.0.2"
 
 import json
 import os
@@ -69,13 +69,25 @@ def run(cmd, check=True):
     return result.stdout
 
 
-def which(binary):
-    return subprocess.run(["/usr/bin/which", binary], capture_output=True,
-                          text=True).stdout.strip()
+def find_binary(name):
+    """Resolve a binary to an absolute path. launchd agents run with a bare
+    PATH (/usr/bin:/bin:...) that excludes Homebrew, so PATH lookup alone
+    fails silently under the agent. Check brew locations explicitly."""
+    for candidate in (f"/opt/homebrew/bin/{name}", f"/usr/local/bin/{name}"):
+        if os.path.exists(candidate):
+            return candidate
+    found = subprocess.run(["/usr/bin/which", name], capture_output=True,
+                           text=True).stdout.strip()
+    return found or None
+
+
+DISPLAYPLACER = find_binary("displayplacer")
+WALLPAPER = find_binary("wallpaper")
 
 
 def check_deps():
-    missing = [b for b in ("displayplacer", "wallpaper") if not which(b)]
+    missing = [n for n, p in (("displayplacer", DISPLAYPLACER),
+                              ("wallpaper", WALLPAPER)) if not p]
     if missing:
         print(f"Missing dependencies: {', '.join(missing)}")
         print("Install with: brew install " + " ".join(missing))
@@ -86,7 +98,7 @@ def check_deps():
 
 def parse_displayplacer_list():
     """Parse `displayplacer list` into a list of screen dicts (live IDs)."""
-    output = run(["displayplacer", "list"])
+    output = run([DISPLAYPLACER, "list"])
     screens = []
     for section in output.split("Persistent screen id: ")[1:]:
         body = section.split("Resolutions for rotation")[0]
@@ -97,6 +109,15 @@ def parse_displayplacer_list():
             key, value = line.split(": ", 1)
             key = key.strip().lower().replace(" ", "_")
             screen[key] = value.strip()
+        # Sanitize: displayplacer appends help text to some lines, e.g.
+        # "Rotation: 0 - rotate internal screen example (may crash...)".
+        for field in ("rotation", "hertz", "color_depth"):
+            m = re.match(r"\d+", screen.get(field, ""))
+            if m:
+                screen[field] = m.group()
+        m = re.match(r"\w+", screen.get("scaling", ""))
+        if m:
+            screen["scaling"] = m.group()
         m = re.search(r"\((-?\d+),(-?\d+)\)", screen.get("origin", ""))
         screen["x"], screen["y"] = (int(m.group(1)), int(m.group(2))) if m else (0, 0)
         res = screen.get("resolution", "0x0")
@@ -133,7 +154,7 @@ def nsscreen_frames():
 # ----------------------------------------------------------------- wallpaper
 
 def get_wallpaper(screen_index):
-    return run(["wallpaper", "get", "--screen", str(screen_index)],
+    return run([WALLPAPER, "get", "--screen", str(screen_index)],
                check=False).strip()
 
 
@@ -143,7 +164,7 @@ def set_wallpaper(path, screen_index):
     if not os.path.exists(path):
         log(f"WARN wallpaper file missing, skipped: {path}")
         return
-    run(["wallpaper", "set", path, "--screen", str(screen_index)])
+    run([WALLPAPER, "set", path, "--screen", str(screen_index)])
 
 
 # -------------------------------------------------------------------- config
@@ -270,7 +291,7 @@ def build_displayplacer_args(pairs):
     return args
 
 
-def apply_wallpapers(slots):
+def apply_wallpapers(slots, only_if_changed=False):
     """Map current NSScreen indexes to slots by position, set wallpapers."""
     frames = nsscreen_frames()
     for slot in slots:
@@ -281,6 +302,8 @@ def apply_wallpapers(slots):
         best = min(frames, key=lambda f: abs(f["x"] - tx) + abs(f["y"] - ty),
                    default=None)
         if best is None:
+            continue
+        if only_if_changed and get_wallpaper(best["i"]) == slot["wallpaper"]:
             continue
         set_wallpaper(slot["wallpaper"], best["i"])
         log(f"Wallpaper '{os.path.basename(slot['wallpaper'])}' -> "
@@ -316,7 +339,7 @@ def cmd_restore(force=True):
     args = build_displayplacer_args(pairs)
     log("Applying layout: displayplacer " + " ".join(f'"{a}"' for a in args),
         also_print=False)
-    run(["displayplacer"] + args)
+    run([DISPLAYPLACER] + args)
     time.sleep(2)  # let WindowServer settle before reading NSScreen
     apply_wallpapers(slots)
     log("Restore complete.")
@@ -351,9 +374,9 @@ def cmd_watch_check():
     if drift:
         log("Drift detected by watcher — restoring.", also_print=False)
         cmd_restore()
-    # Wallpaper-only drift check (cheap): origins fine but wallpaper swapped
+    # Wallpaper-only drift: origins fine but wallpaper swapped/reverted
     elif drift is False:
-        apply_wallpapers(config["slots"])
+        apply_wallpapers(config["slots"], only_if_changed=True)
 
 
 # ------------------------------------------------------------- launchd agent
@@ -371,6 +394,11 @@ AGENT_TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
         <string>{script}</string>
         <string>watch-check</string>
     </array>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
     <key>RunAtLoad</key>
     <true/>
     <key>StartInterval</key>
@@ -417,8 +445,9 @@ def cmd_uninstall_agent():
 # ---------------------------------------------------------------------- main
 
 def main():
-    print(f"mac_displays v{VERSION}", file=sys.stderr)
     cmd = sys.argv[1] if len(sys.argv) > 1 else "restore"
+    if cmd != "watch-check":  # keep launchd log free of banner spam
+        print(f"mac_displays v{VERSION}", file=sys.stderr)
     if cmd in ("version", "--version", "-v"):
         print(VERSION)
         return

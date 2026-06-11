@@ -23,7 +23,7 @@
       "color_depth": "8",
       "scaling": "on",
       "origin": "(0,0)",
-      "degree": "0 - rotate internal screen example (may crash computer, but will be rotated after rebooting): `displayplacer \"id:37D8832A-2D66-02CA-B9F7-8F30A301B230 degree:90\"`",
+      "degree": "0",
       "wallpaper": "/System/Library/CoreServices/DefaultDesktop.heic"
     },
     {

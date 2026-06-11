@@ -1,4 +1,4 @@
-# mac_displays v2.0.0
+# mac_displays v2.0.2
 
 Restores monitor arrangement and per-position wallpapers on macOS. Built specifically for setups with **identical external monitors**, where macOS (tested on Tahoe 26.x, M1):
 
@@ -50,5 +50,7 @@ brew install wallpaper
 
 ## Version history
 
+- **2.0.2** — Silence version banner for `watch-check` so the launchd log isn't flooded every 30s.
+- **2.0.1** — Fix: launchd agent couldn't find Homebrew binaries (bare launchd PATH) — binaries now resolved to absolute paths + PATH set in agent plist. Fix: `Rotation:`/help-text suffixes from `displayplacer list` corrupted saved degree value. Watcher now only re-sets wallpapers that differ (no churn).
 - **2.0.0** — Full rewrite: ID-free slot matching for identical monitors, `save` snapshot command, NSScreen-frame wallpaper mapping, launchd auto-restore agent, drift detection, pause/resume, logging.
 - **1.x** — Serial-ID based matching (broken for identical monitors).
